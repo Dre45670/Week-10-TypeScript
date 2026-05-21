@@ -8,3 +8,13 @@ for (let i = 0; i < regions.length; i++) {
 }
 
 // --- Exercise ---
+
+// Array of Cloud Services
+
+let cloudServices = ["EC2", "S3", "Lambda", "DynamoDB"];
+
+//Loop through the array and print each service
+
+for (let i = 0; i < cloudServices.length; i++) {
+    console.log("Deploying service: " + cloudServices[i]);
+}
