@@ -9,8 +9,3 @@ let tags: string[] = ['project:cdk', 'env:dev'];
 
 // TypeScript Interface
 
-interface MyBucketProps {
-    bucketName: string;
-    versioned: boolean;
-    encryption: s3.BucketEncryption;
-}
