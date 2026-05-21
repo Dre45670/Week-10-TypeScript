@@ -1,12 +1,15 @@
+
 import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
-import { S3Bucket } from '@aws-solutions-constructs/aws-s3-bucket';
 
-// CONSTRUCTS
+import { S3ToLambda } from '@aws-solutions-constructs/aws-s3-lambda';
 
 
-// --- L1 Constructs ---
+// ==============================
+// L1 CONSTRUCT
+// ==============================
 
 export class L1BucketStack extends cdk.Stack {
 
@@ -32,14 +35,14 @@ export class L1BucketStack extends cdk.Stack {
 }
 
 
-// --------------------------
-
-
-// --- L2 Constructs ---
+// ==============================
+// L2 CONSTRUCT
+// ==============================
 
 export class L2BucketStack extends cdk.Stack {
 
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+
         super(scope, id, props);
 
         new s3.Bucket(this, 'MyL2Bucket', {
@@ -53,21 +56,39 @@ export class L2BucketStack extends cdk.Stack {
 }
 
 
-// ----------------------------
-
-
-// --- L3 Constructs ---
+// ==============================
+// L3 CONSTRUCT
+// ==============================
 
 export class L3BucketStack extends cdk.Stack {
 
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+
         super(scope, id, props);
 
-        new S3Bucket(this, 'MyL3Bucket', {
-            bucketName: 'my-l3-bucket-' + this.account,
+        // Lambda function
+        const myLambda = new lambda.Function(this, 'MyLambdaFunction', {
+            runtime: lambda.Runtime.NODEJS_18_X,
+            handler: 'index.handler',
+            code: lambda.Code.fromInline(`
+                exports.handler = async function(event) {
+                    console.log("S3 Event:", JSON.stringify(event));
+                    return {};
+                };
+            `),
+        });
 
-            // This L3 construct automatically applies best practices,
-            // such as encryption, versioning, and access logging
+        // L3 Construct
+        new S3ToLambda(this, 'MyL3Bucket', {
+            lambdaFunctionProps: {
+                runtime: lambda.Runtime.NODEJS_18_X,
+                handler: 'index.handler',
+                code: lambda.Code.fromInline(`
+                    exports.handler = async function(event) {
+                        console.log("Event:", JSON.stringify(event));
+                    };
+                `),
+            }
         });
     }
 }
